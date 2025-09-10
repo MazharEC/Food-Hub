@@ -86,20 +86,20 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
-//    implementation("androidx.credentials:credentials:1.3.0")
-//    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
-//    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-//
-//    implementation("com.facebook.android:facebook-login:17.0.0")
-//    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
-//    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
-//    implementation("com.google.maps.android:maps-compose:6.1.1")
-//    implementation("com.google.android.gms:play-services-location:21.0.1")
-//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
-//    implementation("com.stripe:stripe-android:20.53.0")
-//    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-//    implementation("com.google.firebase:firebase-messaging-ktx")
-//    implementation("com.google.maps.android:android-maps-utils:3.8.2")
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+    implementation("com.facebook.android:facebook-login:17.0.0")
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation("com.google.maps.android:maps-compose:6.1.1")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation("com.stripe:stripe-android:20.53.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.maps.android:android-maps-utils:3.8.2")
 
 
 }
