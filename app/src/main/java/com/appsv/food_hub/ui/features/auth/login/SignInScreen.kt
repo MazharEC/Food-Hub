@@ -1,4 +1,4 @@
-package com.appsv.food_hub.ui.features.auth.signup
+package com.appsv.food_hub.ui.features.auth.login
 
 
 import androidx.compose.animation.AnimatedContent
@@ -52,16 +52,20 @@ import com.appsv.food_hub.R
 import com.appsv.food_hub.ui.BasicDialog
 import com.appsv.food_hub.ui.FoodHubTextField
 import com.appsv.food_hub.ui.GroupSocialButtons
-import com.appsv.food_hub.ui.features.auth.AuthScreen
+import com.appsv.food_hub.ui.navigation.AuthScreen
 import com.appsv.food_hub.ui.navigation.Home
-import com.appsv.food_hub.ui.navigation.Login
+import com.appsv.food_hub.ui.navigation.SignUp
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hiltViewModel()) {
-    val name = viewModel.name.collectAsStateWithLifecycle()
+fun SignInScreen(
+    navController: NavController,
+    isCutomer: Boolean = true,
+    viewModel: SignInViewModel = hiltViewModel()
+) {
     val email = viewModel.email.collectAsStateWithLifecycle()
     val password = viewModel.password.collectAsStateWithLifecycle()
     val errorMessage = remember { mutableStateOf<String?>(null) }
@@ -75,19 +79,20 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                 showDialog = true
             }
     }
+
     Box(modifier = Modifier.fillMaxSize()) {
 
 
         val uiState = viewModel.uiState.collectAsState()
         when (uiState.value) {
 
-            is SignUpViewModel.SignupEvent.Error -> {
+            is SignInViewModel.SignInEvent.Error -> {
                 // show error
                 loading.value = false
                 errorMessage.value = "Failed"
             }
 
-            is SignUpViewModel.SignupEvent.Loading -> {
+            is SignInViewModel.SignInEvent.Loading -> {
                 loading.value = true
                 errorMessage.value = null
             }
@@ -101,7 +106,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
         LaunchedEffect(true) {
             viewModel.navigationEvent.collectLatest { event ->
                 when (event) {
-                    is SignUpViewModel.SigupNavigationEvent.NavigateToHome -> {
+                    is SignInViewModel.SigInNavigationEvent.NavigateToHome -> {
                         navController.navigate(Home) {
                             popUpTo(AuthScreen) {
                                 inclusive = true
@@ -109,8 +114,8 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                         }
                     }
 
-                    is SignUpViewModel.SigupNavigationEvent.NavigateToLogin -> {
-                        navController.navigate(Login)
+                    is SignInViewModel.SigInNavigationEvent.NavigateToSignUp -> {
+                        navController.navigate(SignUp)
                     }
                 }
             }
@@ -130,19 +135,12 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
         ) {
             Box(modifier = Modifier.weight(1f))
             Text(
-                text = stringResource(id = R.string.sign_up),
+                text = stringResource(id = R.string.sign_in),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.size(20.dp))
-            FoodHubTextField(
-                value = name.value, onValueChange = { viewModel.onNameChange(it) },
-                label = {
-                    Text(text = stringResource(id = R.string.full_name), color = Color.Gray)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
             FoodHubTextField(
                 value = email.value,
                 onValueChange = { viewModel.onEmailChange(it) },
@@ -170,7 +168,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
             Spacer(modifier = Modifier.size(16.dp))
             Text(text = errorMessage.value ?: "", color = Color.Red)
             Button(
-                onClick = viewModel::onSignUpClick, modifier = Modifier.height(48.dp),
+                onClick = viewModel::onSignInClick, modifier = Modifier.height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.theme_color))
             ) {
                 Box {
@@ -189,7 +187,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                             )
                         } else {
                             Text(
-                                text = stringResource(id = R.string.sign_up),
+                                text = stringResource(id = R.string.sign_in),
                                 color = Color.White,
                                 modifier = Modifier.padding(horizontal = 32.dp)
                             )
@@ -201,17 +199,23 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                 }
             }
             Spacer(modifier = Modifier.size(16.dp))
-            Text(
-                text = stringResource(id = R.string.alread_have_account),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        viewModel.onLoginClicked()
-                    }
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-            GroupSocialButtons(color = Color.Black, viewModel)
+            if(isCutomer) {
+                Text(
+                    text = stringResource(id = R.string.dont_have_account),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            viewModel.onSignUpClicked()
+                        }
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                val context = LocalContext.current
+                GroupSocialButtons(
+                    color = Color.Black,
+                    viewModel = viewModel,
+                )
+            }
         }
     }
     if (showDialog) {
