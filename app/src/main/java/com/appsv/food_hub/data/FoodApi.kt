@@ -1,6 +1,7 @@
 package com.appsv.food_hub.data
 
 import com.appsv.food_hub.data.models.AuthResponse
+import com.appsv.food_hub.data.models.OAuthRequest
 import com.appsv.food_hub.data.models.SignInRequest
 import com.appsv.food_hub.data.models.SignUpRequest
 import retrofit2.http.Body
@@ -17,5 +18,7 @@ interface FoodApi {
     @POST("/auth/login")
     suspend fun signIn(@Body request: SignInRequest): AuthResponse
 
+    @POST("/auth/oauth")
+    suspend fun oAuth(@Body request: OAuthRequest): AuthResponse
 
 }

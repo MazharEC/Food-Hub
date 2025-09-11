@@ -1,5 +1,6 @@
 package com.appsv.food_hub.ui.features.auth.login
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.appsv.food_hub.data.FoodApi
 import com.appsv.food_hub.data.models.SignInRequest
@@ -68,6 +69,20 @@ class SignInViewModel @Inject constructor(
                     }
                     _uiState.value = SignInEvent.Error
                 }
+            }
+        }
+    }
+
+    fun onGoogleSignInClick(context: Context) {
+        viewModelScope.launch {
+            _uiState.value = SignInEvent.Loading
+            val response = googleAuthUiProvider.signIn(context, credentialManager.creat(context))
+
+            if(response != null){
+                _uiState.value = SignInEvent.Success
+                _navigationEvent.emit(SigInNavigationEvent.NavigateToHome)
+            }else{
+                _uiState.value = SignInEvent.Error
             }
         }
     }
