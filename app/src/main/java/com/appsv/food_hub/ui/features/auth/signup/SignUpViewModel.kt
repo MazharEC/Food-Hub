@@ -1,10 +1,11 @@
 package com.appsv.food_hub.ui.features.auth.signup
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewModelScope
 import com.appsv.food_hub.data.FoodApi
 import com.appsv.food_hub.data.models.SignUpRequest
+import com.appsv.food_hub.data.remote.ApiResponse
+import com.appsv.food_hub.data.remote.safeApiCall
+import com.appsv.food_hub.ui.features.auth.BaseAuthViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

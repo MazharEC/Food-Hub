@@ -1,9 +1,12 @@
 package com.appsv.food_hub.ui.features.auth.login
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.appsv.food_hub.data.FoodApi
+import com.appsv.food_hub.data.FoodHubSession
 import com.appsv.food_hub.data.models.SignInRequest
+import com.appsv.food_hub.data.remote.ApiResponse
+import com.appsv.food_hub.data.remote.safeApiCall
+import com.appsv.food_hub.ui.features.auth.BaseAuthViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,20 +76,6 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onGoogleSignInClick(context: Context) {
-        viewModelScope.launch {
-            _uiState.value = SignInEvent.Loading
-            val response = googleAuthUiProvider.signIn(context, credentialManager.creat(context))
-
-            if(response != null){
-                _uiState.value = SignInEvent.Success
-                _navigationEvent.emit(SigInNavigationEvent.NavigateToHome)
-            }else{
-                _uiState.value = SignInEvent.Error
-            }
-        }
-    }
-
     fun onSignUpClicked() {
         viewModelScope.launch {
             _navigationEvent.emit(SigInNavigationEvent.NavigateToSignUp)
@@ -110,4 +99,28 @@ class SignInViewModel @Inject constructor(
             _uiState.value = SignInEvent.Loading
         }
     }
-}
+
+    override fun onGoogleError(msg: String) {
+        viewModelScope.launch {
+            errorDescription = msg
+            error = "Google Sign In Failed"
+            _uiState.value = SignInEvent.Error
+        }
+    }
+
+    override fun onFacebookError(msg: String) {
+        viewModelScope.launch {
+            errorDescription = msg
+            error = "Facebook Sign In Failed"
+            _uiState.value = SignInEvent.Error
+        }
+    }
+
+    override fun onSocialLoginSuccess(token: String) {
+        viewModelScope.launch {
+            session.storeToken(token)
+            _uiState.value = SignInEvent.Success
+            _navigationEvent.emit(SigInNavigationEvent.NavigateToHome)
+        }
+    }
+}}

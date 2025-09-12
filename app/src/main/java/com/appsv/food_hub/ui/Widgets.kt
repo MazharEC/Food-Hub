@@ -38,12 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.appsv.food_hub.R
+import com.appsv.food_hub.ui.features.auth.BaseAuthViewModel
 
 
 @Composable
 fun GroupSocialButtons(
     color: Color = Color.White,
-   // viewModel: BaseAuthViewModel
+    viewModel: BaseAuthViewModel
 ) {
 
     Column {

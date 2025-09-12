@@ -5,17 +5,26 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -29,34 +38,72 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.appsv.food_hub.R
+import com.appsv.food_hub.ui.BasicDialog
+import com.appsv.food_hub.ui.GroupSocialButtons
+import com.appsv.food_hub.ui.navigation.AuthScreen
+import com.appsv.food_hub.ui.navigation.Home
+import com.appsv.food_hub.ui.navigation.Login
+import com.appsv.food_hub.ui.navigation.SignUp
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthScreen() {
+fun AuthScreen(
+    navController: NavController,
+    isCustomer: Boolean = true,
+    viewModel: AuthScreenViewModel = hiltViewModel()
+) {
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
     val imageSize = remember {
         mutableStateOf(IntSize.Zero)
     }
     val brush = Brush.verticalGradient(
         colors = listOf(
-            Color.Transparent, Color.Black
+            androidx.compose.ui.graphics.Color.Transparent, androidx.compose.ui.graphics.Color.Black
         ),
         startY = imageSize.value.height.toFloat() / 3,
     )
+    LaunchedEffect(true) {
+        viewModel.navigationEvent.collectLatest { event ->
+            when (event) {
+                is AuthScreenViewModel.AuthNavigationEvent.NavigateToHome -> {
+                    navController.navigate(Home) {
+                        popUpTo(AuthScreen) {
+                            inclusive = true
+                        }
+                    }
+                }
+
+                is AuthScreenViewModel.AuthNavigationEvent.NavigateToSignUp -> {
+                    navController.navigate(SignUp)
+                }
+
+                is AuthScreenViewModel.AuthNavigationEvent.ShowErrorDialog -> {
+                    showDialog = true
+                }
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.background),
+        Image(painter = painterResource(id = R.drawable.background),
             contentDescription = null,
             modifier = Modifier
                 .onGloballyPositioned {
                     imageSize.value = it.size
                 }
                 .alpha(0.6f),
-            contentScale = ContentScale.FillBounds
-        )
+            contentScale = ContentScale.FillBounds)
         Box(
             modifier = Modifier
                 .matchParentSize()
@@ -75,7 +122,6 @@ fun AuthScreen() {
             Text(text = stringResource(id = R.string.skip), color = colorResource(id = R.color.theme_color))
         }
 
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,7 +136,7 @@ fun AuthScreen() {
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
             )
             Text(
-                text = stringResource(id = R.string.app_name),
+                text = stringResource(id = R.string.food_hub),
                 color = colorResource(id = R.color.theme_color),
                 modifier = Modifier,
                 fontSize = 50.sp,
@@ -105,7 +151,6 @@ fun AuthScreen() {
 
         }
 
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -113,12 +158,12 @@ fun AuthScreen() {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-//            if (isCustomer) {
-//                GroupSocialButtons(viewModel = viewModel)
-//                Spacer(modifier = Modifier.height(16.dp))
+            if (isCustomer) {
+                GroupSocialButtons(viewModel = viewModel)
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                      //  navController.navigate(SignUp)
+                        navController.navigate(SignUp)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray.copy(alpha = 0.2f)),
@@ -130,10 +175,26 @@ fun AuthScreen() {
             }
 
             TextButton(onClick = {
-               // navController.navigate(Login)
+                navController.navigate(Login)
             }) {
                 Text(text = stringResource(id = R.string.alread_have_account), color = Color.White)
             }
-       // }
+        }
+
+    }
+
+    if (showDialog) {
+        ModalBottomSheet(onDismissRequest = { showDialog = false }, sheetState = sheetState) {
+            BasicDialog(
+                title = viewModel.error,
+                description = viewModel.errorDescription,
+                onClick = {
+                    scope.launch {
+                        sheetState.hide()
+                        showDialog = false
+                    }
+                }
+            )
+        }
     }
 }

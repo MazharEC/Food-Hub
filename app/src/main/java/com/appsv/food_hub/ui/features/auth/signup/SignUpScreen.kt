@@ -103,7 +103,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                 when (event) {
                     is SignUpViewModel.SigupNavigationEvent.NavigateToHome -> {
                         navController.navigate(Home) {
-                            popUpTo(AuthScreen) {
+                            popUpTo(AuthScreen()) {
                                 inclusive = true
                             }
                         }
