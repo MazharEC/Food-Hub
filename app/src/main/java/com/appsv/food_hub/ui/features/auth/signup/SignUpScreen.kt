@@ -101,7 +101,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
         LaunchedEffect(true) {
             viewModel.navigationEvent.collectLatest { event ->
                 when (event) {
-                    is SignUpViewModel.SigupNavigationEvent.NavigateToHome -> {
+                    is SignUpViewModel.SignupNavigationEvent.NavigateToHome -> {
                         navController.navigate(Home) {
                             popUpTo(AuthScreen()) {
                                 inclusive = true
@@ -109,7 +109,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                         }
                     }
 
-                    is SignUpViewModel.SigupNavigationEvent.NavigateToLogin -> {
+                    is SignUpViewModel.SignupNavigationEvent.NavigateToLogin -> {
                         navController.navigate(Login)
                     }
                 }

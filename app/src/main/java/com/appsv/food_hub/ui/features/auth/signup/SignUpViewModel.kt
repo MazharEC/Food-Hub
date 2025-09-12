@@ -2,6 +2,7 @@ package com.appsv.food_hub.ui.features.auth.signup
 
 import androidx.lifecycle.viewModelScope
 import com.appsv.food_hub.data.FoodApi
+import com.appsv.food_hub.data.FoodHubSession
 import com.appsv.food_hub.data.models.SignUpRequest
 import com.appsv.food_hub.data.remote.ApiResponse
 import com.appsv.food_hub.data.remote.safeApiCall
@@ -20,7 +21,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi, val ses
     private val _uiState = MutableStateFlow<SignupEvent>(SignupEvent.Nothing)
     val uiState = _uiState.asStateFlow()
 
-    private val _navigationEvent = MutableSharedFlow<SigupNavigationEvent>()
+    private val _navigationEvent = MutableSharedFlow<SignupNavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
 
     private val _email = MutableStateFlow("")
@@ -61,7 +62,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi, val ses
                     is ApiResponse.Success -> {
                         _uiState.value = SignupEvent.Success
                         session.storeToken(response.data.token)
-                        _navigationEvent.emit(SigupNavigationEvent.NavigateToHome)
+                        _navigationEvent.emit(SignupNavigationEvent.NavigateToHome)
                     }
 
                     else -> {
@@ -70,7 +71,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi, val ses
                         errorDescription = "Failed to sign up"
                         when (errr) {
                             400 -> {
-                                error = "Invalid Credintials"
+                                error = "Invalid Credentials"
                                 errorDescription = "Please enter correct details."
                             }
                         }
@@ -90,7 +91,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi, val ses
 
     fun onLoginClicked() {
         viewModelScope.launch {
-            _navigationEvent.emit(SigupNavigationEvent.NavigateToLogin)
+            _navigationEvent.emit(SignupNavigationEvent.NavigateToLogin)
         }
     }
 
@@ -120,13 +121,13 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi, val ses
         viewModelScope.launch {
             session.storeToken(token)
             _uiState.value = SignupEvent.Success
-            _navigationEvent.emit(SigupNavigationEvent.NavigateToHome)
+            _navigationEvent.emit(SignupNavigationEvent.NavigateToHome)
         }
     }
 
-    sealed class SigupNavigationEvent {
-        object NavigateToLogin : SigupNavigationEvent()
-        object NavigateToHome : SigupNavigationEvent()
+    sealed class SignupNavigationEvent {
+        object NavigateToLogin : SignupNavigationEvent()
+        object NavigateToHome : SignupNavigationEvent()
     }
 
     sealed class SignupEvent {
