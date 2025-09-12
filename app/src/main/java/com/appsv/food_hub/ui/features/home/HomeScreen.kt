@@ -216,7 +216,7 @@ fun SharedTransitionScope.RestaurantItem(
                                 .size(12.dp)
                         )
                         Text(
-                            text = "Free Delivery", style = Typography.bodySmall, color = Color.Gray
+                            text = "30 Min", style = Typography.bodySmall, color = Color.Gray
                         )
                     }
                 }
