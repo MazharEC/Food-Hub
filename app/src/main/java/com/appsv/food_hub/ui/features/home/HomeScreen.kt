@@ -49,6 +49,7 @@ import coil3.compose.AsyncImage
 import com.appsv.food_hub.R
 import com.appsv.food_hub.data.models.Category
 import com.appsv.food_hub.data.models.Restaurant
+import com.appsv.food_hub.ui.navigation.RestaurantDetails
 import com.appsv.food_hub.ui.theme.Typography
 import kotlinx.coroutines.flow.collectLatest
 
@@ -64,7 +65,7 @@ fun SharedTransitionScope.HomeScreen(
         viewModel.navigationEvent.collectLatest {
             when (it) {
                 is HomeViewModel.HomeScreenNavigationEvents.NavigateToDetail -> {
-                    //navController.navigate(RestaurantDetails(it.id, it.name, it.imageUrl))
+                    navController.navigate(RestaurantDetails(it.id, it.name, it.imageUrl))
                 }
 
                 else -> {

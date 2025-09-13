@@ -2,6 +2,7 @@ package com.appsv.food_hub.data
 
 import com.appsv.food_hub.data.models.AuthResponse
 import com.appsv.food_hub.data.models.CategoriesResponse
+import com.appsv.food_hub.data.models.FoodItemResponse
 import com.appsv.food_hub.data.models.OAuthRequest
 import com.appsv.food_hub.data.models.ResturauntsResponse
 import com.appsv.food_hub.data.models.SignInRequest
@@ -10,6 +11,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface FoodApi {
@@ -29,5 +31,11 @@ interface FoodApi {
 
     @POST("/auth/oauth")
     suspend fun oAuth(@Body request: OAuthRequest): Response<AuthResponse>
+
+    @GET("/restaurants/{restaurantId}/menu")
+    suspend fun getFoodItemForRestaurant(@Path("restaurantId") restaurantId: String): Response<FoodItemResponse>
+
+    @POST("/cart")
+    suspend fun addToCart(@Body request: AddToCartRequest): Response<AddToCartResponse>
 
 }
