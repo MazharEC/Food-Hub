@@ -27,7 +27,7 @@ class FoodDetailsViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel
     val quantity = _quantity.asStateFlow()
 
     fun incrementQuantity() {
-        if (quantity.value == 5) {
+        if (quantity.value == 10) {
             return
         }
         _quantity.value += 1

@@ -67,7 +67,7 @@ fun SharedTransitionScope.RestaurantDetailsScreen(
         item {
             RestaurantDetails(
                 title = name,
-                description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien fermentum aliquam. Nullam nec nunc nec libero fermentum aliquam. Nullam nec nunc nec libero fermentum aliquam.",
+                description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 animatedVisibilityScope = animatedVisibilityScope,
                 restaurantID = restaurantID
             )

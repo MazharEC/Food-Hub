@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -38,6 +39,7 @@ import com.appsv.food_hub.data.models.FoodItem
 import com.appsv.food_hub.ui.BasicDialog
 import com.appsv.food_hub.ui.features.restaurant_details.RestaurantDetails
 import com.appsv.food_hub.ui.features.restaurant_details.RestaurantDetailsHeader
+import com.appsv.food_hub.ui.navigation.Cart
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -84,7 +86,7 @@ import kotlinx.coroutines.flow.collectLatest
                 }
 
                 is FoodDetailsViewModel.FoodDetailsEvent.goToCart -> {
-                   // navController.navigate(Cart)
+                    navController.navigate(Cart)
                 }
 
                 else -> {}
@@ -93,7 +95,7 @@ import kotlinx.coroutines.flow.collectLatest
     }
     Column(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         RestaurantDetailsHeader(imageUrl = foodItem.imageUrl,
             restaurantID = foodItem.id?:"",
@@ -138,10 +140,10 @@ import kotlinx.coroutines.flow.collectLatest
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 8.dp)
                     .clip(RoundedCornerShape(32.dp)),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 AnimatedVisibility(visible = !isLoading.value) {
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             painter = painterResource(id = R.drawable.cart),
                             contentDescription = null
@@ -213,7 +215,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun FoodItemCounter(onCounterIncrement: () -> Unit, onCounterDecrement: () -> Unit, count: Int) {
-    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Image(painter = painterResource(id = R.drawable.add),
             contentDescription = null,
             modifier = Modifier
