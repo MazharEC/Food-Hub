@@ -53,6 +53,7 @@ import com.appsv.food_hub.ui.features.cart.CartScreen
 import com.appsv.food_hub.ui.navigation.Cart
 import com.appsv.food_hub.ui.theme.Food_hubTheme
 import com.appsv.food_hub.data.models.FoodItem
+import com.appsv.food_hub.ui.features.home.HomeViewModel
 import com.appsv.food_hub.ui.features.cart.CartViewModel
 import com.appsv.food_hub.ui.features.food_item_details.FoodDetailsScreen
 import com.appsv.food_hub.ui.features.home.HomeScreen
@@ -88,16 +89,16 @@ class MainActivity : ComponentActivity() {
 
 
     sealed class BottomNavItem(val route: NavRoute, val icon: Int) {
-        object Home : BottomNavItem(navigation.Home, R.drawable.ic_home)
-        object Cart : BottomNavItem(navigation.Cart, R.drawable.ic_cart)
+        object Home : BottomNavItem(com.appsv.food_hub.ui.navigation.Home, R.drawable.ic_home)
+        object Cart : BottomNavItem(com.appsv.food_hub.ui.navigation.Cart, R.drawable.ic_cart)
         object Notification :
             BottomNavItem(
-                navigation.Notification,
+                com.appsv.food_hub.ui.navigation.Notification,
                 R.drawable.ic_notification
             )
 
         object Orders : BottomNavItem(
-            navigation.OrderList,
+            OrderList,
             R.drawable.ic_orders
         )
     }
@@ -120,18 +121,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val cartViewModel: CartViewModel = hiltViewModel()
                 val cartItemSize = cartViewModel.cartItemCount.collectAsStateWithLifecycle()
-                val notificationViewModel: NotificationsViewModel = hiltViewModel()
-                val unreadCount = notificationViewModel.unreadCount.collectAsStateWithLifecycle()
 
-                LaunchedEffect(key1 = true) {
-                    viewModel.event.collectLatest {
-                        when (it) {
-                            is HomeViewModel.HomeEvent.NavigateToOrderDetail -> {
-                                navController.navigate(OrderDetails(it.orderID))
-                            }
-                        }
-                    }
-                }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
@@ -162,9 +153,7 @@ class MainActivity : ComponentActivity() {
                                                 if (item.route == Cart && cartItemSize.value > 0) {
                                                     ItemCount(cartItemSize.value)
                                                 }
-                                                if (item.route == Notification && unreadCount.value > 0) {
-                                                    ItemCount(unreadCount.value)
-                                                }
+
                                             }
                                         })
                                 }
