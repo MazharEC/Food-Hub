@@ -2,6 +2,8 @@ package com.appsv.food_hub.data
 
 import com.appsv.food_hub.data.models.AddToCartRequest
 import com.appsv.food_hub.data.models.AddToCartResponse
+import com.appsv.food_hub.data.models.Address
+import com.appsv.food_hub.data.models.AddressListResponse
 import com.appsv.food_hub.data.models.AuthResponse
 import com.appsv.food_hub.data.models.CartResponse
 import com.appsv.food_hub.data.models.CategoriesResponse
@@ -9,6 +11,7 @@ import com.appsv.food_hub.data.models.FoodItemResponse
 import com.appsv.food_hub.data.models.GenericMsgResponse
 import com.appsv.food_hub.data.models.OAuthRequest
 import com.appsv.food_hub.data.models.ResturauntsResponse
+import com.appsv.food_hub.data.models.ReverseGeoCodeRequest
 import com.appsv.food_hub.data.models.SignInRequest
 import com.appsv.food_hub.data.models.SignUpRequest
 import com.appsv.food_hub.data.models.UpdateCartItemRequest
@@ -53,5 +56,14 @@ interface FoodApi {
 
     @DELETE("/cart/{cartItemId}")
     suspend fun deleteCartItem(@Path("cartItemId") cartItemId: String): Response<GenericMsgResponse>
+
+    @GET("/addresses")
+    suspend fun getUserAddress(): Response<AddressListResponse>
+
+    @POST("/addresses/reverse-geocode")
+    suspend fun reverseGeocode(@Body request: ReverseGeoCodeRequest): Response<Address>
+
+    @POST("/addresses")
+    suspend fun storeAddress(@Body address: Address): Response<GenericMsgResponse>
 
 }

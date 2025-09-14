@@ -72,6 +72,7 @@ import com.appsv.food_hub.ui.navigation.OrderList
 import com.appsv.food_hub.ui.navigation.RestaurantDetails
 import com.appsv.food_hub.ui.navigation.SignUp
 import com.appsv.food_hub.ui.navigation.foodItemNavType
+import com.appsv.food_hub.ui.theme.Mustard
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
@@ -252,7 +253,7 @@ fun BoxScope.ItemCount(count: Int) {
         modifier = Modifier
             .size(16.dp)
             .clip(CircleShape)
-            //.background(Mustard)
+            .background(Mustard)
             .align(Alignment.TopEnd)
     ) {
         Text(

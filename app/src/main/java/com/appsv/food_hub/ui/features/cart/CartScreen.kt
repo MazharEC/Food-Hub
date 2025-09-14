@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.appsv.food_hub.R
+import com.appsv.food_hub.data.models.Address
 import com.appsv.food_hub.data.models.CartItem
 import com.appsv.food_hub.data.models.CheckoutDetails
 import com.appsv.food_hub.ui.BasicDialog
@@ -64,6 +65,38 @@ fun CartScreen(navController: NavController, viewModel: CartViewModel) {
             false
         )
     }
+}
+
+@Composable
+fun AddressCard(address: Address?, onAddressClicked: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .shadow(8.dp)
+            .clip(
+                RoundedCornerShape(8.dp)
+            )
+            .background(Color.White)
+            .clickable { onAddressClicked.invoke() }
+            .padding(16.dp)
+
+    ) {
+        if (address != null) {
+            Column {
+                Text(text = address.addressLine1, style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(
+                    text = "${address.city}, ${address.state}, ${address.country}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+            }
+        } else {
+            Text(text = "Select Address", style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+
 }
 
 @Composable
