@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appsv.food_hub.data.FoodApi
+import com.appsv.food_hub.data.models.Address
 import com.appsv.food_hub.data.models.CartItem
 import com.appsv.food_hub.data.models.CartResponse
+import com.appsv.food_hub.data.models.PaymentIntentRequest
 import com.appsv.food_hub.data.models.UpdateCartItemRequest
 import com.appsv.food_hub.data.remote.ApiResponse
 import com.appsv.food_hub.data.remote.safeApiCall
@@ -29,6 +31,9 @@ class CartViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel() {
     private var cartResponse: CartResponse? = null
     private val _cartItemCount = MutableStateFlow(0)
     val cartItemCount = _cartItemCount.asStateFlow()
+
+    private val address = MutableStateFlow<Address?>(null)
+    val selectedAddress = address.asStateFlow()
 
 
     init {
@@ -114,6 +119,41 @@ class CartViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel() {
                 }
             }
         }
+    }
+
+
+    fun checkout() {
+        viewModelScope.launch {
+            _uiState.value = CartUiState.Loading
+            val paymentDetails =
+                safeApiCall { foodApi.getPaymentIntent(PaymentIntentRequest(address.value!!.id!!)) }
+
+            when (paymentDetails) {
+                is ApiResponse.Success -> {
+                   // paymentIntent = paymentDetails.data
+                    //_event.emit(CartEvent.OnInitiatePayment(paymentDetails.data))
+                    _uiState.value = CartUiState.Success(cartResponse!!)
+                }
+
+                else -> {
+                    errorTitle = "Cannot Checkout"
+                    errorMessage = "An error occurred while checking out"
+                    _event.emit(CartEvent.showErrorDialog)
+                    _uiState.value = CartUiState.Success(cartResponse!!)
+                }
+            }
+
+        }
+    }
+
+    fun onAddressClicked() {
+        viewModelScope.launch {
+            _event.emit(CartEvent.onAddressClicked)
+        }
+    }
+
+    fun onAddressSelected(it: Address) {
+        address.value = it
     }
 
 

@@ -49,6 +49,8 @@ import com.appsv.food_hub.data.models.CartItem
 import com.appsv.food_hub.data.models.CheckoutDetails
 import com.appsv.food_hub.ui.BasicDialog
 import com.appsv.food_hub.ui.features.food_item_details.FoodItemCounter
+import com.appsv.food_hub.ui.navigation.AddressList
+import com.appsv.food_hub.ui.navigation.OrderSuccess
 import com.appsv.food_hub.utils.StringUtils
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheet
@@ -65,6 +67,174 @@ fun CartScreen(navController: NavController, viewModel: CartViewModel) {
             false
         )
     }
+    val address =
+        navController.currentBackStackEntry?.savedStateHandle?.getStateFlow<Address?>(
+            "address",
+            null
+        )
+            ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = address?.value) {
+        address?.value?.let {
+            viewModel.onAddressSelected(it)
+        }
+    }
+
+    val paymentSheet = rememberPaymentSheet(paymentResultCallback = {
+        if (it is PaymentSheetResult.Completed) {
+            //viewModel.onPaymentSuccess()
+        } else {
+            viewModel.onPaymentFailed()
+        }
+    })
+    LaunchedEffect(key1 = true) {
+        viewModel.event.collectLatest {
+            when (it) {
+                is CartViewModel.CartEvent.onItemRemoveError,
+                is CartViewModel.CartEvent.onQuantityUpdateError,
+                is CartViewModel.CartEvent.showErrorDialog -> {
+                    showErrorDialog.value = true
+                }
+
+                is CartViewModel.CartEvent.onAddressClicked -> {
+                    navController.navigate(AddressList)
+                }
+
+                is CartViewModel.CartEvent.OrderSuccess -> {
+                    navController.navigate(OrderSuccess(it.orderId!!))
+                }
+
+//                is CartViewModel.CartEvent.OnInitiatePayment -> {
+//                    PaymentConfiguration.init(navController.context, it.data.publishableKey)
+//                    val customer = PaymentSheet.CustomerConfiguration(
+//                        it.data.customerId,
+//                        it.data.ephemeralKeySecret
+//                    )
+//                    val paymentSheetConfig = PaymentSheet.Configuration(
+//                        merchantDisplayName = "FoodHub",
+//                        customer = customer,
+//                        allowsDelayedPaymentMethods = false,
+//                    )
+//
+//                    // Initiate payment
+//
+//                    paymentSheet.presentWithPaymentIntent(
+//                        it.data.paymentIntentClientSecret,
+//                        paymentSheetConfig
+//                    )
+//                }
+
+                else -> {
+
+                }
+            }
+        }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        CartHeaderView(onBack = { navController.popBackStack() })
+        Spacer(modifier = Modifier.size(16.dp))
+        when (uiState.value) {
+            is CartViewModel.CartUiState.Loading -> {
+                Spacer(modifier = Modifier.size(16.dp))
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.size(16.dp))
+                    CircularProgressIndicator()
+                    Text(
+                        text = "Loading",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            is CartViewModel.CartUiState.Success -> {
+                val data = (uiState.value as CartViewModel.CartUiState.Success).data
+                if (data.items.size > 0) {
+                    LazyColumn {
+                        items(data.items) { it ->
+                            CartItemView(cartItem = it, onIncrement = { cartItem, _ ->
+                                viewModel.incrementQuantity(cartItem)
+                            }, onDecrement = { cartItem, _ ->
+                                viewModel.decrementQuantity(cartItem)
+                            }, onRemove = {
+                                viewModel.removeItem(it)
+                            })
+                        }
+                        item {
+                            CheckoutDetailsView(data.checkoutDetails)
+                        }
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_cart),
+                            contentDescription = null,
+                            tint = Color.Gray
+                        )
+                        Text(
+                            text = "No items in cart",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
+
+
+            is CartViewModel.CartUiState.Error -> {
+                Column(
+                    Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    val message = (uiState.value as CartViewModel.CartUiState.Error).message
+                    Text(text = message, style = MaterialTheme.typography.bodyMedium)
+                    Button(onClick = { /*TODO*/ }) {
+                        Text(text = "Retry")
+                    }
+
+                }
+            }
+
+            CartViewModel.CartUiState.Nothing -> {}
+        }
+        val selectedAddress = viewModel.selectedAddress.collectAsStateWithLifecycle()
+        Spacer(modifier = Modifier.weight(1f))
+        if (uiState.value is CartViewModel.CartUiState.Success) {
+            AddressCard(selectedAddress.value) {
+                viewModel.onAddressClicked()
+            }
+            Button(
+                onClick = { viewModel.checkout() },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = selectedAddress.value != null
+            ) {
+                Text(text = "Checkout")
+            }
+        }
+
+    }
+
+    if (showErrorDialog.value) {
+        ModalBottomSheet(onDismissRequest = { showErrorDialog.value = false }) {
+            BasicDialog(title = viewModel.errorTitle, description = viewModel.errorMessage) {
+                showErrorDialog.value = false
+            }
+        }
+    }
+
 }
 
 @Composable

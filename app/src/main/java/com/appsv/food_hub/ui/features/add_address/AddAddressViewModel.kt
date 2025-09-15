@@ -28,7 +28,7 @@ class AddAddressViewModel @Inject constructor(
     private val _event = MutableSharedFlow<AddAddressEvent>()
     val event = _event.asSharedFlow()
 
-    private val _address = MutableStateFlow<Address?>(null)
+    private val _address = MutableStateFlow<com.appsv.food_hub.data.models.Address?>(null)
     val address = _address.asStateFlow()
     fun getLocation() = locationManager.getLocation()
 

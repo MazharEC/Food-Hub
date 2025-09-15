@@ -10,6 +10,8 @@ import com.appsv.food_hub.data.models.CategoriesResponse
 import com.appsv.food_hub.data.models.FoodItemResponse
 import com.appsv.food_hub.data.models.GenericMsgResponse
 import com.appsv.food_hub.data.models.OAuthRequest
+import com.appsv.food_hub.data.models.PaymentIntentRequest
+import com.appsv.food_hub.data.models.PaymentIntentResponse
 import com.appsv.food_hub.data.models.ResturauntsResponse
 import com.appsv.food_hub.data.models.ReverseGeoCodeRequest
 import com.appsv.food_hub.data.models.SignInRequest
@@ -65,5 +67,8 @@ interface FoodApi {
 
     @POST("/addresses")
     suspend fun storeAddress(@Body address: Address): Response<GenericMsgResponse>
+
+    @POST("/payments/create-intent")
+    suspend fun getPaymentIntent(@Body request: PaymentIntentRequest): Response<PaymentIntentResponse>
 
 }
