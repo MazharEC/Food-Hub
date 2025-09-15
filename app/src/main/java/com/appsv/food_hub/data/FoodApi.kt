@@ -7,9 +7,13 @@ import com.appsv.food_hub.data.models.AddressListResponse
 import com.appsv.food_hub.data.models.AuthResponse
 import com.appsv.food_hub.data.models.CartResponse
 import com.appsv.food_hub.data.models.CategoriesResponse
+import com.appsv.food_hub.data.models.ConfirmPaymentRequest
+import com.appsv.food_hub.data.models.ConfirmPaymentResponse
 import com.appsv.food_hub.data.models.FoodItemResponse
 import com.appsv.food_hub.data.models.GenericMsgResponse
 import com.appsv.food_hub.data.models.OAuthRequest
+import com.appsv.food_hub.data.models.Order
+import com.appsv.food_hub.data.models.OrderListResponse
 import com.appsv.food_hub.data.models.PaymentIntentRequest
 import com.appsv.food_hub.data.models.PaymentIntentResponse
 import com.appsv.food_hub.data.models.ResturauntsResponse
@@ -70,5 +74,16 @@ interface FoodApi {
 
     @POST("/payments/create-intent")
     suspend fun getPaymentIntent(@Body request: PaymentIntentRequest): Response<PaymentIntentResponse>
+
+    @POST("/payments/confirm/{paymentIntentId}")
+    suspend fun verifyPurchase(
+        @Body request: ConfirmPaymentRequest, @Path("paymentIntentId") paymentIntentId: String
+    ): Response<ConfirmPaymentResponse>
+
+    @GET("/orders")
+    suspend fun getOrders(): Response<OrderListResponse>
+
+    @GET("/orders/{orderId}")
+    suspend fun getOrderDetails(@Path("orderId") orderId: String): Response<Order>
 
 }

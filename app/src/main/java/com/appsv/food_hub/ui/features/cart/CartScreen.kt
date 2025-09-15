@@ -1,6 +1,5 @@
 package com.appsv.food_hub.ui.features.cart
 
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -82,7 +80,7 @@ fun CartScreen(navController: NavController, viewModel: CartViewModel) {
 
     val paymentSheet = rememberPaymentSheet(paymentResultCallback = {
         if (it is PaymentSheetResult.Completed) {
-            //viewModel.onPaymentSuccess()
+            viewModel.onPaymentSuccess()
         } else {
             viewModel.onPaymentFailed()
         }
@@ -104,25 +102,25 @@ fun CartScreen(navController: NavController, viewModel: CartViewModel) {
                     navController.navigate(OrderSuccess(it.orderId!!))
                 }
 
-//                is CartViewModel.CartEvent.OnInitiatePayment -> {
-//                    PaymentConfiguration.init(navController.context, it.data.publishableKey)
-//                    val customer = PaymentSheet.CustomerConfiguration(
-//                        it.data.customerId,
-//                        it.data.ephemeralKeySecret
-//                    )
-//                    val paymentSheetConfig = PaymentSheet.Configuration(
-//                        merchantDisplayName = "FoodHub",
-//                        customer = customer,
-//                        allowsDelayedPaymentMethods = false,
-//                    )
-//
-//                    // Initiate payment
-//
-//                    paymentSheet.presentWithPaymentIntent(
-//                        it.data.paymentIntentClientSecret,
-//                        paymentSheetConfig
-//                    )
-//                }
+                is CartViewModel.CartEvent.OnInitiatePayment -> {
+                    PaymentConfiguration.init(navController.context, it.data.publishableKey)
+                    val customer = PaymentSheet.CustomerConfiguration(
+                        it.data.customerId,
+                        it.data.ephemeralKeySecret
+                    )
+                    val paymentSheetConfig = PaymentSheet.Configuration(
+                        merchantDisplayName = "FoodHub",
+                        customer = customer,
+                        allowsDelayedPaymentMethods = false,
+                    )
+
+                    // Initiate payment
+
+                    paymentSheet.presentWithPaymentIntent(
+                        it.data.paymentIntentClientSecret,
+                        paymentSheetConfig
+                    )
+                }
 
                 else -> {
 
@@ -157,7 +155,7 @@ fun CartScreen(navController: NavController, viewModel: CartViewModel) {
 
             is CartViewModel.CartUiState.Success -> {
                 val data = (uiState.value as CartViewModel.CartUiState.Success).data
-                if (data.items.size > 0) {
+                if (data.items.isNotEmpty()) {
                     LazyColumn {
                         items(data.items) { it ->
                             CartItemView(cartItem = it, onIncrement = { cartItem, _ ->
