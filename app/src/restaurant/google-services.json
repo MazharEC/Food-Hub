@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "495672068708",
+    "project_id": "heasty-choice",
+    "storage_bucket": "heasty-choice.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:495672068708:android:d7a47ff5058d9f5c822d71",
+        "android_client_info": {
+          "package_name": "com.appsv.food_hub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy-ZaOmWXdFAhmZmLgSijDraIYvqGMKGc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:495672068708:android:11c7a2c7956ae19a822d71",
+        "android_client_info": {
+          "package_name": "com.appsv.food_hub.restaurant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy-ZaOmWXdFAhmZmLgSijDraIYvqGMKGc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
