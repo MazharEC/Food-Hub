@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -61,6 +62,8 @@ import com.appsv.food_hub.ui.features.restaurant_details.RestaurantDetailsScreen
 import com.appsv.food_hub.ui.features.auth.AuthScreen
 import com.appsv.food_hub.ui.features.auth.login.SignInScreen
 import com.appsv.food_hub.ui.features.auth.signup.SignUpScreen
+import com.appsv.food_hub.ui.features.order_details.OrderDetailsScreen
+import com.appsv.food_hub.ui.features.orders.OrderListScreen
 import com.appsv.food_hub.ui.navigation.AuthScreen
 import com.appsv.food_hub.ui.navigation.FoodDetails
 import com.appsv.food_hub.ui.navigation.Home
@@ -235,6 +238,19 @@ class MainActivity : ComponentActivity() {
                             composable<Cart>() {
                                 shouldShowBottomNav.value = true
                                 CartScreen(navController, cartViewModel)
+                            }
+
+                            composable<OrderList> {
+                                shouldShowBottomNav.value = true
+                                OrderListScreen(navController)
+                            }
+
+                            composable<OrderDetails> {
+                                SideEffect {
+                                    shouldShowBottomNav.value = false
+                                }
+                                val orderID = it.toRoute<OrderDetails>().orderId
+                                OrderDetailsScreen(navController, orderID)
                             }
                         }
                     }

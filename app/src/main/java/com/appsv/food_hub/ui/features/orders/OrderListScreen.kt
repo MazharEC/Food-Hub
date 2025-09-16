@@ -32,7 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -213,13 +215,13 @@ fun OrderDetailsText(order: Order) {
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(12.dp)),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.size(8.dp))
             Column {
                 Text(
                     text = order.id,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                    textAlign = TextAlign.End,
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium,
@@ -247,7 +249,7 @@ fun OrderListItem(order: Order, onClick: () -> Unit) {
             .fillMaxWidth()
             .shadow(8.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(color = androidx.compose.ui.graphics.Color.White)
+            .background(color = Color.White)
             .padding(16.dp)
     ) {
         OrderDetailsText(order = order)
@@ -255,7 +257,7 @@ fun OrderListItem(order: Order, onClick: () -> Unit) {
             Text(
                 text = "View Details",
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
         }
 
