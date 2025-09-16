@@ -9,8 +9,10 @@ import com.appsv.food_hub.data.models.CartResponse
 import com.appsv.food_hub.data.models.CategoriesResponse
 import com.appsv.food_hub.data.models.ConfirmPaymentRequest
 import com.appsv.food_hub.data.models.ConfirmPaymentResponse
+import com.appsv.food_hub.data.models.FCMRequest
 import com.appsv.food_hub.data.models.FoodItemResponse
 import com.appsv.food_hub.data.models.GenericMsgResponse
+import com.appsv.food_hub.data.models.NotificationListResponse
 import com.appsv.food_hub.data.models.OAuthRequest
 import com.appsv.food_hub.data.models.Order
 import com.appsv.food_hub.data.models.OrderListResponse
@@ -27,6 +29,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -85,5 +88,14 @@ interface FoodApi {
 
     @GET("/orders/{orderId}")
     suspend fun getOrderDetails(@Path("orderId") orderId: String): Response<Order>
+
+    @PUT("/notifications/fcm-token")
+    suspend fun updateToken(@Body request: FCMRequest): Response<GenericMsgResponse>
+
+    @POST("/notifications/{id}/read")
+    suspend fun readNotification(@Path("id") id: String): Response<GenericMsgResponse>
+
+    @GET("/notifications")
+    suspend fun getNotifications(): Response<NotificationListResponse>
 
 }
