@@ -10,6 +10,8 @@ import com.appsv.food_hub.data.models.CategoriesResponse
 import com.appsv.food_hub.data.models.ConfirmPaymentRequest
 import com.appsv.food_hub.data.models.ConfirmPaymentResponse
 import com.appsv.food_hub.data.models.FCMRequest
+import com.appsv.food_hub.data.models.FoodItem
+import com.appsv.food_hub.data.models.FoodItemListResponse
 import com.appsv.food_hub.data.models.FoodItemResponse
 import com.appsv.food_hub.data.models.GenericMsgResponse
 import com.appsv.food_hub.data.models.NotificationListResponse
@@ -18,6 +20,7 @@ import com.appsv.food_hub.data.models.Order
 import com.appsv.food_hub.data.models.OrderListResponse
 import com.appsv.food_hub.data.models.PaymentIntentRequest
 import com.appsv.food_hub.data.models.PaymentIntentResponse
+import com.appsv.food_hub.data.models.Restaurant
 import com.appsv.food_hub.data.models.ResturauntsResponse
 import com.appsv.food_hub.data.models.ReverseGeoCodeRequest
 import com.appsv.food_hub.data.models.SignInRequest
@@ -97,5 +100,27 @@ interface FoodApi {
 
     @GET("/notifications")
     suspend fun getNotifications(): Response<NotificationListResponse>
+
+    // Restaurant endpoints
+    @GET("/restaurant-owner/profile")
+    suspend fun getRestaurantProfile(): Response<Restaurant>
+
+    @GET("/restaurant-owner/orders")
+    suspend fun getRestaurantOrders(@Query("status") status: String): Response<OrderListResponse>
+
+    @PATCH("orders/{orderId}/status")
+    suspend fun updateOrderStatus(
+        @Path("orderId") orderId: String,
+        @Body map: Map<String, String>
+    ): Response<GenericMsgResponse>
+
+    @GET("/restaurants/{id}/menu")
+    suspend fun getRestaurantMenu(@Path("id") restaurantId: String): Response<FoodItemListResponse>
+
+    @POST("/restaurants/{id}/menu")
+    suspend fun addRestaurantMenu(
+        @Path("id") restaurantId: String,
+        @Body foodItem: FoodItem
+    ): Response<GenericMsgResponse>
 
 }
