@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.appsv.food_hub.ui.features.common.FoodItemView
 import com.appsv.food_hub.ui.features.notifications.ErrorScreen
 import com.appsv.food_hub.ui.features.notifications.LoadingScreen
 import com.appsv.food_hub.ui.navigation.AddMenu
+import com.appsv.food_hub.ui.navigation.FoodDetails
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -61,7 +63,7 @@ fun SharedTransitionScope.ListMenuItemsScreen(
                 LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                     items(state.data, key = { it.id ?: "" }) { item ->
                         FoodItemView(item, animatedVisibilityScope) {
-                            navController.navigate(FoodDetails.route)
+                            navController.navigate(FoodDetails)
                         }
                     }
                 }

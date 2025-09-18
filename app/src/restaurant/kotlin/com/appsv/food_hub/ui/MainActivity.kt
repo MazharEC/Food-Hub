@@ -1,18 +1,15 @@
-package com.appsv.food_hub
+package com.appsv.food_hub.ui
 
-
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
+import android.view.View
+import android.view.animation.OvershootInterpolator
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -27,6 +24,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,29 +37,54 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.animation.doOnEnd
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.appsv.food_hub.BaseFoodHubActivity
+import com.appsv.food_hub.HomeViewModel
+import com.appsv.food_hub.R
 import com.appsv.food_hub.data.FoodApi
 import com.appsv.food_hub.data.FoodHubSession
+import com.appsv.food_hub.ui.feature.home.HomeScreen
+import com.appsv.food_hub.ui.feature.menu.add.AddMenuItemScreen
+import com.appsv.food_hub.ui.feature.menu.image.ImagePickerScreen
+import com.appsv.food_hub.ui.feature.menu.list.ListMenuItemsScreen
+import com.appsv.food_hub.ui.feature.order_details.OrderDetailsScreen
+import com.appsv.food_hub.ui.feature.order_list.OrderListScreen
 import com.appsv.food_hub.ui.features.auth.AuthScreen
 import com.appsv.food_hub.ui.features.auth.login.SignInScreen
 import com.appsv.food_hub.ui.features.auth.signup.SignUpScreen
+import com.appsv.food_hub.ui.features.notifications.NotificationsList
+import com.appsv.food_hub.ui.features.notifications.NotificationsViewModel
+import com.appsv.food_hub.ui.navigation.AddMenu
 import com.appsv.food_hub.ui.navigation.AuthScreen
 import com.appsv.food_hub.ui.navigation.Home
+import com.appsv.food_hub.ui.navigation.ImagePicker
 import com.appsv.food_hub.ui.navigation.Login
+import com.appsv.food_hub.ui.navigation.MenuList
 import com.appsv.food_hub.ui.navigation.NavRoute
+import com.appsv.food_hub.ui.navigation.Notification
+import com.appsv.food_hub.ui.navigation.OrderDetails
 import com.appsv.food_hub.ui.navigation.OrderList
 import com.appsv.food_hub.ui.navigation.SignUp
 import com.appsv.food_hub.ui.theme.Food_hubTheme
 import com.appsv.food_hub.ui.theme.Mustard
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseFoodHubActivity() {
     var showSplashScreen = true
 
     @Inject
@@ -68,7 +92,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var session: FoodHubSession
-
 
     sealed class BottomNavItem(val route: NavRoute, val icon: Int) {
         object Home : BottomNavItem(com.appsv.food_hub.ui.navigation.Home, R.drawable.ic_home)
@@ -79,30 +102,78 @@ class MainActivity : ComponentActivity() {
             )
 
         object Orders : BottomNavItem(
-            OrderList,
+            com.appsv.food_hub.ui.navigation.OrderList,
             R.drawable.ic_orders
+        )
+
+        object Menu : BottomNavItem(
+            com.appsv.food_hub.ui.navigation.MenuList,
+            android.R.drawable.ic_menu_more
         )
     }
 
     @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                showSplashScreen
+            }
+            setOnExitAnimationListener { screen ->
+                val zoomX = ObjectAnimator.ofFloat(
+                    screen.iconView,
+                    View.SCALE_X,
+                    0.5f,
+                    0f
+                )
+                val zoomY = ObjectAnimator.ofFloat(
+                    screen.iconView,
+                    View.SCALE_Y,
+                    0.5f,
+                    0f
+                )
+                zoomX.duration = 500
+                zoomY.duration = 500
+                zoomX.interpolator = OvershootInterpolator()
+                zoomY.interpolator = OvershootInterpolator()
+                zoomX.doOnEnd {
+                    screen.remove()
+                }
+                zoomY.doOnEnd {
+                    screen.remove()
+                }
+                zoomY.start()
+                zoomX.start()
+            }
+        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             Food_hubTheme {
+
                 val shouldShowBottomNav = remember {
                     mutableStateOf(false)
                 }
                 val navItems = listOf(
                     BottomNavItem.Home,
                     BottomNavItem.Notification,
-                    BottomNavItem.Orders
+                    BottomNavItem.Orders,
+                    BottomNavItem.Menu
                 )
                 val navController = rememberNavController()
+                val notificationViewModel: NotificationsViewModel = hiltViewModel()
+                val unreadCount = notificationViewModel.unreadCount.collectAsStateWithLifecycle()
 
+                LaunchedEffect(key1 = true) {
+                    viewModel.event.collectLatest {
+                        when (it) {
+                            is HomeViewModel.HomeEvent.NavigateToOrderDetail -> {
+                                navController.navigate(OrderDetails(it.orderID))
+                            }
+                        }
+                    }
+                }
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         val currentRoute =
                             navController.currentBackStackEntryAsState().value?.destination
@@ -128,7 +199,9 @@ class MainActivity : ComponentActivity() {
                                                     modifier = Modifier.align(Center)
                                                 )
 
-
+                                                if (item.route == Notification && unreadCount.value > 0) {
+                                                    ItemCount(unreadCount.value)
+                                                }
                                             }
                                         })
                                 }
@@ -137,34 +210,10 @@ class MainActivity : ComponentActivity() {
                     }) { innerPadding ->
 
                     SharedTransitionLayout {
-                        NavHost(
+                        FoodHubNavHost(
                             navController = navController,
                             startDestination = if (session.getToken() != null) Home else AuthScreen,
                             modifier = Modifier.padding(innerPadding),
-                            enterTransition = {
-                                slideIntoContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = tween(300)
-                                ) + fadeIn(animationSpec = tween(300))
-                            },
-                            exitTransition = {
-                                slideOutOfContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = tween(300)
-                                ) + fadeOut(animationSpec = tween(300))
-                            },
-                            popEnterTransition = {
-                                slideIntoContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                    animationSpec = tween(300)
-                                ) + fadeIn(animationSpec = tween(300))
-                            },
-                            popExitTransition = {
-                                slideOutOfContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                    animationSpec = tween(300)
-                                ) + fadeOut(animationSpec = tween(300))
-                            }
                         ) {
                             composable<SignUp> {
                                 shouldShowBottomNav.value = false
@@ -172,21 +221,57 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<AuthScreen> {
                                 shouldShowBottomNav.value = false
-                                AuthScreen(navController)
+                                AuthScreen(navController, false)
                             }
                             composable<Login> {
                                 shouldShowBottomNav.value = false
-                                SignInScreen(navController)
+                                SignInScreen(navController, false)
                             }
-
-
+                            composable<Home> {
+                                shouldShowBottomNav.value = true
+                                HomeScreen(navController)
+                            }
+                            composable<Notification> {
+                                SideEffect {
+                                    shouldShowBottomNav.value = true
+                                }
+                                NotificationsList(navController, notificationViewModel)
+                            }
+                            composable<OrderList> {
+                                shouldShowBottomNav.value = true
+                                OrderListScreen(navController)
+                            }
+                            composable<OrderDetails> {
+                                shouldShowBottomNav.value = false
+                                val orderID = it.toRoute<OrderDetails>().orderId
+                                OrderDetailsScreen(orderID, navController)
+                            }
+                            composable<MenuList> {
+                                shouldShowBottomNav.value = true
+                                ListMenuItemsScreen(navController, this)
+                            }
+                            composable<AddMenu> {
+                                shouldShowBottomNav.value = false
+                                AddMenuItemScreen(navController)
+                            }
+                            composable<ImagePicker> {
+                                shouldShowBottomNav.value = false
+                                ImagePickerScreen(navController)
+                            }
                         }
                     }
+
                 }
             }
         }
+
         if (::foodApi.isInitialized) {
-            Log.d("FoodApi", foodApi.toString())
+            Log.d("MainActivity", "FoodApi initialized")
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(3000)
+            showSplashScreen = false
+            processIntent(intent, viewModel)
         }
     }
 }
@@ -209,4 +294,3 @@ fun BoxScope.ItemCount(count: Int) {
         )
     }
 }
-

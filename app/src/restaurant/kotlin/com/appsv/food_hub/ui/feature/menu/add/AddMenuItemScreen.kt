@@ -59,7 +59,7 @@ fun AddMenuItemScreen(
                 }
 
                 is AddMenuItemViewModel.AddMenuItemEvent.AddNewImage -> {
-                    navController.navigate(ImagePicker)
+                    navController.navigate( ImagePicker)
                 }
 
                 is AddMenuItemViewModel.AddMenuItemEvent.ShowErrorMessage -> {
