@@ -1,4 +1,4 @@
-package com.appsv.food_hub.ui.theme
+package com.appsv.food_hub
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
@@ -46,9 +46,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.appsv.food_hub.BaseFoodHubActivity
-import com.appsv.food_hub.HomeViewModel
-import com.appsv.food_hub.R
 import com.appsv.food_hub.data.FoodApi
 import com.appsv.food_hub.data.FoodHubSession
 import com.appsv.food_hub.ui.FoodHubNavHost
@@ -57,6 +54,7 @@ import com.appsv.food_hub.ui.features.auth.login.SignInScreen
 import com.appsv.food_hub.ui.features.auth.signup.SignUpScreen
 import com.appsv.food_hub.ui.features.notifications.NotificationsList
 import com.appsv.food_hub.ui.features.notifications.NotificationsViewModel
+import com.appsv.food_hub.ui.home.DeliveriesScreen
 import com.appsv.food_hub.ui.navigation.AuthScreen
 import com.appsv.food_hub.ui.navigation.Home
 import com.appsv.food_hub.ui.navigation.Login
@@ -65,6 +63,8 @@ import com.appsv.food_hub.ui.navigation.Notification
 import com.appsv.food_hub.ui.navigation.OrderDetails
 import com.appsv.food_hub.ui.navigation.OrderList
 import com.appsv.food_hub.ui.navigation.SignUp
+import com.appsv.food_hub.ui.theme.Food_hubTheme
+import com.appsv.food_hub.ui.theme.Mustard
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,7 +92,7 @@ class MainActivity : BaseFoodHubActivity() {
             )
 
         object Orders : BottomNavItem(
-            com.appsv.food_hub.ui.navigation.OrderList,
+            OrderList,
             R.drawable.ic_orders
         )
     }
@@ -157,7 +157,8 @@ class MainActivity : BaseFoodHubActivity() {
                     }
                 }
 
-                Scaffold(modifier = Modifier.fillMaxSize(),
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         val currentRoute =
                             navController.currentBackStackEntryAsState().value?.destination
@@ -260,7 +261,7 @@ fun BoxScope.ItemCount(count: Int) {
         Text(
             text = "${count}",
             modifier = Modifier
-                .align(Alignment.Center),
+                .align(Center),
             color = Color.White,
             style = TextStyle(fontSize = 10.sp)
         )
