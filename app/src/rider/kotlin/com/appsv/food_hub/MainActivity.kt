@@ -63,6 +63,8 @@ import com.appsv.food_hub.ui.navigation.Notification
 import com.appsv.food_hub.ui.navigation.OrderDetails
 import com.appsv.food_hub.ui.navigation.OrderList
 import com.appsv.food_hub.ui.navigation.SignUp
+import com.appsv.food_hub.ui.orders.details.OrderDetailsScreen
+import com.appsv.food_hub.ui.orders.list.OrdersListScreen
 import com.appsv.food_hub.ui.theme.Food_hubTheme
 import com.appsv.food_hub.ui.theme.Mustard
 import dagger.hilt.android.AndroidEntryPoint
