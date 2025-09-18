@@ -14,6 +14,7 @@ import com.appsv.food_hub.data.models.FoodItem
 import com.appsv.food_hub.data.models.FoodItemListResponse
 import com.appsv.food_hub.data.models.FoodItemResponse
 import com.appsv.food_hub.data.models.GenericMsgResponse
+import com.appsv.food_hub.data.models.ImageUploadResponse
 import com.appsv.food_hub.data.models.NotificationListResponse
 import com.appsv.food_hub.data.models.OAuthRequest
 import com.appsv.food_hub.data.models.Order
@@ -26,13 +27,16 @@ import com.appsv.food_hub.data.models.ReverseGeoCodeRequest
 import com.appsv.food_hub.data.models.SignInRequest
 import com.appsv.food_hub.data.models.SignUpRequest
 import com.appsv.food_hub.data.models.UpdateCartItemRequest
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -122,5 +126,10 @@ interface FoodApi {
         @Path("id") restaurantId: String,
         @Body foodItem: FoodItem
     ): Response<GenericMsgResponse>
+
+
+    @POST("/images/upload")
+    @Multipart
+    suspend fun uploadImage(@Part image: MultipartBody.Part): Response<ImageUploadResponse>
 
 }
