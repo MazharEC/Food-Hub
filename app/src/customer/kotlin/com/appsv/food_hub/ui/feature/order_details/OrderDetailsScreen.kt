@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.appsv.food_hub.R
 import com.appsv.food_hub.ui.features.orders.OrderDetailsText
+import com.appsv.food_hub.ui.features.orders.order_map.OrderTrackerMapView
 import com.appsv.food_hub.utils.OrdersUtils
 import com.appsv.food_hub.utils.StringUtils
 import kotlinx.coroutines.flow.collectLatest
@@ -111,7 +113,7 @@ fun OrderDetailsScreen(
                 }
 
                 if (order.status == OrdersUtils.OrderStatus.OUT_FOR_DELIVERY.name) {
-                    //OrderTrackerMapView(modifier = Modifier, viewModel = viewModel, order = order)
+                    OrderTrackerMapView(modifier = Modifier, viewModel = viewModel, order = order)
                 }
             }
 

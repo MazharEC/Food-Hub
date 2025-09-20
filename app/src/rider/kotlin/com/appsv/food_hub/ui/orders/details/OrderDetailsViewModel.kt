@@ -1,10 +1,11 @@
 package com.appsv.food_hub.ui.orders.details
 
-
+import androidx.lifecycle.viewModelScope
 import com.appsv.food_hub.data.FoodApi
 import com.appsv.food_hub.data.models.Order
 import com.appsv.food_hub.data.remote.ApiResponse
 import com.appsv.food_hub.data.remote.safeApiCall
+import com.appsv.food_hub.ui.features.orders.OrderDetailsBaseViewModel
 import com.appsv.food_hub.utils.OrdersUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,8 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrderDetailsViewModel @Inject constructor(
-    val foodApi: FoodApi
-) {
+    val foodApi: FoodApi,
+    repository: LocationUpdateSocketRepository
+) : OrderDetailsBaseViewModel(repository) {
 
     val listOfStatus = OrdersUtils.OrderStatus.entries.map { it.name }
 
