@@ -1,7 +1,6 @@
 package com.appsv.food_hub.ui.orders.details
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+
 import com.appsv.food_hub.data.FoodApi
 import com.appsv.food_hub.data.models.Order
 import com.appsv.food_hub.data.remote.ApiResponse

@@ -1,29 +1,40 @@
-package com.appsv.food_hub.data
+package com.appsv.food_hub.di
 
 import android.content.Context
+import com.appsv.food_hub.data.FoodApi
+import com.appsv.food_hub.data.FoodHubSession
+import com.appsv.food_hub.data.SocketService
+import com.appsv.food_hub.data.SocketServiceImpl
+import com.appsv.food_hub.location.LocationManager
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+object AppModule {
 
     @Provides
-    fun provideClient(session: FoodHubSession): OkHttpClient {
+    fun provideClient(session: FoodHubSession, @ApplicationContext context: Context): OkHttpClient {
         val client = OkHttpClient.Builder()
-        client.addInterceptor{chain ->
+        client.addInterceptor { chain ->
             val request = chain.request().newBuilder()
                 .addHeader("Authorization", "Bearer ${session.getToken()}")
+                .addHeader("X-Package-Name", context.packageName)
                 .build()
             chain.proceed(request)
         }
+        client.addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        })
         return client.build()
     }
 
@@ -31,10 +42,9 @@ object NetworkModule {
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(client)
-            .baseUrl("http://10.0.2.2:8080")  //AIzaSyBySwg06c4pdlv31y7IMMS8fBpOvdgA45Q
+            .baseUrl("http://10.0.2.2:8080")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
     }
 
     @Provides
@@ -45,12 +55,23 @@ object NetworkModule {
     @Provides
     fun provideSession(@ApplicationContext context: Context): FoodHubSession {
         return FoodHubSession(context)
-
     }
 
     @Provides
     fun provideLocationService(@ApplicationContext context: Context): FusedLocationProviderClient {
-        return locationService.getFusedLocationProviderClient(context)
+        return LocationServices.getFusedLocationProviderClient(context)
+    }
 
+    @Provides
+    fun provideLocationManager(
+        fusedLocationProviderClient: FusedLocationProviderClient,
+        @ApplicationContext context: Context
+    ): LocationManager {
+        return LocationManager(fusedLocationProviderClient, context)
+    }
+
+    @Provides
+    fun provideSocketService(): SocketService {
+        return SocketServiceImpl()
     }
 }

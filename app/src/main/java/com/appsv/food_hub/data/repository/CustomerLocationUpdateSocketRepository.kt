@@ -1,14 +1,12 @@
 package com.appsv.food_hub.data.repository
 
 import com.appsv.food_hub.data.SocketService
-import com.appsv.food_hub.ui.features.orders.order_map.LocationUpdateBaseRepository
 import javax.inject.Inject
 
-
-class CustomerLocationUpdateSocketRepository @Inject constructor(socketService: SocketService) :
+class CustomerLocationUpdateSocketRepository @Inject constructor(private val socketService: SocketService) :
     LocationUpdateBaseRepository(socketService) {
 
-    override fun connect(orderID: String, riderID: String) {
+    fun connect(orderID: String, riderID: String) {
         try {
             socketService.connect(
                 orderID, riderID, null, null
@@ -18,7 +16,7 @@ class CustomerLocationUpdateSocketRepository @Inject constructor(socketService: 
         }
     }
 
-    override fun disconnect() {
+    fun disconnect() {
         socketService.disconnect()
     }
 }
